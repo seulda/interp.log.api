@@ -34,10 +34,6 @@ public class Member extends BaseEntity {
   @Schema(description = "고유 ID")
   private Long id;
 
-  @Column(nullable = false, unique = true)
-  @Schema(description = "회원 ID")
-  private String userId;
-
   @Column(nullable = false)
   @Schema(description = "비밀번호")
   private String password;
