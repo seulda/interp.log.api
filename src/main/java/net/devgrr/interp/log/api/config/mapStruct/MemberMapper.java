@@ -3,11 +3,10 @@ package net.devgrr.interp.log.api.config.mapStruct;
 import net.devgrr.interp.log.api.member.MemberRole;
 import net.devgrr.interp.log.api.member.dto.MemberRequest;
 import net.devgrr.interp.log.api.member.dto.MemberResponse;
+import net.devgrr.interp.log.api.member.dto.MemberUpdateRequest;
+import net.devgrr.interp.log.api.member.dto.ResultResponse;
 import net.devgrr.interp.log.api.member.entity.Member;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 // import org.mapstruct.factory.Mappers;
@@ -63,4 +62,5 @@ public interface MemberMapper {
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   void updateMember(MemberUpdateRequest req, Member member);
 
+  ResultResponse toResultResponse(boolean result, String message);
 }

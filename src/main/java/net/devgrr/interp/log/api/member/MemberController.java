@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.devgrr.interp.log.api.config.exception.BaseException;
 import net.devgrr.interp.log.api.config.mapStruct.MemberMapper;
-import net.devgrr.interp.log.api.member.dto.MemberRequest;
-import net.devgrr.interp.log.api.member.dto.MemberResponse;
-import net.devgrr.interp.log.api.member.dto.MemberValidationGroup;
+import net.devgrr.interp.log.api.member.dto.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,11 +63,17 @@ public class MemberController {
     return memberMapper.toResponse(memberService.putUsers(userDetails, req));
   }
 
-  /*
-   * TODO: 사용자 비활성(삭제) API 추가
-   * */
+  @Operation(description = "사용자의 계정을 비활성화합니다.")
+  @PatchMapping("/{email}")
+  public ResultResponse putUsersDeactivateByEmail(@PathVariable("email") String email)
+      throws BaseException {
+    return memberService.putUsersDeactivateByEmail(email);
+  }
 
-  /*
-   * TODO: 사용자 활성(복구) API 추가
-   * */
+  @Operation(description = "사용자의 계정을 활성화합니다.")
+  @PatchMapping("/active/{email}")
+  public ResultResponse putUsersActiveByEmail(@PathVariable("email") String email)
+      throws BaseException {
+    return memberService.putUsersActiveByEmail(email);
+  }
 }

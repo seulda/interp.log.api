@@ -2,6 +2,8 @@ package net.devgrr.interp.log.api.member;
 
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.constraints.Email;
 import net.devgrr.interp.log.api.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,6 +26,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
   Optional<Member> findByEmail(String email);
 
   @Modifying
-  @Query("UPDATE Member m SET m.isActive = false WHERE m.userId = :userId")
-  void deactivateByUserId(@Param("userId") String userId);
+  @Query("UPDATE Member m SET m.isActive = false , m.updateDate=NOW() WHERE m.email = :email")
+  int deactivateByEmail(String email);
+
+  @Modifying
+  @Query("UPDATE Member m SET m.isActive = true, m.updateDate=NOW() WHERE m.email = :email")
+  int activeByEmail(String email);
 }
