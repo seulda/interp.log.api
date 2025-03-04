@@ -53,4 +53,14 @@ public interface MemberMapper {
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "refreshToken", source = "refreshToken")
   Member updateMemberRefreshToken(Member updateMember, @MappingTarget Member member);
+
+  @Mapping(
+      source = "password",
+      target = "password",
+      qualifiedByName = "pwEncoder",
+      conditionExpression = "java(req.password() != null && !req.password().isEmpty())")
+  @Mapping(target = "updateDate", expression = "java(java.time.LocalDateTime.now())")
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateMember(MemberUpdateRequest req, Member member);
+
 }

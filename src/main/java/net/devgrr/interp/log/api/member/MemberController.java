@@ -38,10 +38,10 @@ public class MemberController {
         .collect(Collectors.toList());
   }
 
-  @Operation(description = "사용자를 조회한다.")
-  @GetMapping("/{userId}")
-  public MemberResponse getUsersById(@PathVariable("userId") String userId) throws BaseException {
-    return memberMapper.toResponse(memberService.getUsersById(userId));
+  @Operation(description = "이메일로 사용자를 조회한다.")
+  @GetMapping("/{email}")
+  public MemberResponse getUsersById(@PathVariable("email") String email) throws BaseException {
+    return memberMapper.toResponse(memberService.getUsersByEmail(email));
   }
 
   @Operation(description = "사용자를 생성한다.")
@@ -54,9 +54,14 @@ public class MemberController {
     return memberMapper.toResponse(memberService.setUsers(req));
   }
 
-  /*
-   * TODO: 사용자 정보 수정 API 추가
-   * */
+  @Operation(description = "사용자의 정보를 수정한다.")
+  @PutMapping("/")
+  public MemberResponse putUsers(
+      @Validated(MemberValidationGroup.createGroup.class) @RequestBody MemberUpdateRequest req,
+      @AuthenticationPrincipal UserDetails userDetails)
+      throws BaseException {
+    return memberMapper.toResponse(memberService.putUsers(userDetails, req));
+  }
 
   /*
    * TODO: 사용자 비활성(삭제) API 추가
