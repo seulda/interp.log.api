@@ -53,25 +53,29 @@ public class CommentService {
         .collect(Collectors.toList());
   }
 
+  /// 댓글 2depth 이상 하이라키 구현
+  /// get rootComments
   public List<CommentResponse> getCommentsRecursively(Integer postId) {
     List<Comment> comments = getCommentsByPostId(postId);
 
-    List<Comment> rootComments = comments.stream()
-            .filter(comment -> comment.getParentCommentId() == null)
-            .toList();
+    List<Comment> rootComments =
+        comments.stream().filter(comment -> comment.getParentCommentId() == null).toList();
 
     return rootComments.stream()
-            .map(rootComment -> buildCommentHierarchy(rootComment, comments))
-            .toList();
+        .map(rootComment -> buildCommentHierarchy(rootComment, comments))
+        .toList();
   }
 
+  ///  재귀함수 - get childComments
   private CommentResponse buildCommentHierarchy(Comment rootComment, List<Comment> comments) {
-      List<CommentResponse> childComments = comments.stream()
-              .filter(comment -> Objects.equals(comment.getParentCommentId(), rootComment.getId()))
-              .map(child -> buildCommentHierarchy(child, comments))
-              .toList();
-      return commentMapper.toResponseWithChildren(rootComment, childComments);
+    List<CommentResponse> childComments =
+        comments.stream()
+            .filter(comment -> Objects.equals(comment.getParentCommentId(), rootComment.getId()))
+            .map(child -> buildCommentHierarchy(child, comments))
+            .toList();
+    return commentMapper.toResponseWithChildren(rootComment, childComments);
   }
+
 
   public Comment existCommentById(Integer id) throws BaseException {
     return commentRepository
