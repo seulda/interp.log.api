@@ -15,10 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
   List<Member> findAllByIsActiveFalse();
 
-  Optional<Member> findByUserId(String userId);
-
-  boolean existsByUserId(String userId);
-
   boolean existsByEmail(String email);
 
   Optional<Member> findByRefreshToken(String refreshToken);
@@ -26,10 +22,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
   Optional<Member> findByEmail(String email);
 
   @Modifying
-  @Query("UPDATE Member m SET m.isActive = false , m.updateDate=NOW() WHERE m.email = :email")
+  @Query("UPDATE Member m SET m.isActive = false , m.updatedDate=NOW() WHERE m.email = :email")
   int deactivateByEmail(String email);
 
   @Modifying
-  @Query("UPDATE Member m SET m.isActive = true, m.updateDate=NOW() WHERE m.email = :email")
+  @Query("UPDATE Member m SET m.isActive = true, m.updatedDate=NOW() WHERE m.email = :email")
   int activeByEmail(String email);
 }

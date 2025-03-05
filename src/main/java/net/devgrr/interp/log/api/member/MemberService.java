@@ -35,19 +35,9 @@ public class MemberService {
     }
   }
 
-  public Member getUsersById(String userId) throws BaseException {
-    Member member = memberRepository.findByUserId(userId).orElse(null);
-    if (member == null) {
-      throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 ID 입니다.");
-    }
-    return member;
-  }
-
   @Transactional
   public Member setUsers(MemberRequest req) throws BaseException {
-    if (memberRepository.existsByUserId(req.userId())) {
-      throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "이미 존재하는 ID 입니다.");
-    } else if (memberRepository.existsByEmail(req.email())) {
+    if (memberRepository.existsByEmail(req.email())) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "이미 존재하는 Email 입니다.");
     }
 
@@ -96,16 +86,18 @@ public class MemberService {
   public ResultResponse putUsersDeactivateByEmail(String email) throws BaseException {
     boolean result = false;
 
-    Member member = memberRepository.findByEmail(email).orElseThrow(
-            () -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 Email 입니다.")
-    );
+    Member member =
+        memberRepository
+            .findByEmail(email)
+            .orElseThrow(
+                () -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 Email 입니다."));
 
-    if(!member.getIsActive()) {
+    if (!member.getIsActive()) {
       return memberMapper.toResultResponse(result, "이미 비활성화 된 회원입니다.");
     }
 
-    try{
-      if(memberRepository.deactivateByEmail(member.getEmail()) == 1) result = true;
+    try {
+      if (memberRepository.deactivateByEmail(member.getEmail()) == 1) result = true;
     } catch (Exception e) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, e.getMessage());
     }
@@ -115,16 +107,18 @@ public class MemberService {
   public ResultResponse putUsersActiveByEmail(String email) throws BaseException {
     boolean result = false;
 
-    Member member = memberRepository.findByEmail(email).orElseThrow(
-            () -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 Email 입니다.")
-    );
+    Member member =
+        memberRepository
+            .findByEmail(email)
+            .orElseThrow(
+                () -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "존재하지 않는 Email 입니다."));
 
-    if(member.getIsActive()) {
+    if (member.getIsActive()) {
       return memberMapper.toResultResponse(result, "이미 활성화 된 회원입니다.");
     }
 
-    try{
-      if(memberRepository.activeByEmail(member.getEmail()) == 1) result = true;
+    try {
+      if (memberRepository.activeByEmail(member.getEmail()) == 1) result = true;
     } catch (Exception e) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, e.getMessage());
     }

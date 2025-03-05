@@ -42,14 +42,13 @@ public interface MemberMapper {
   MemberResponse toResponse(Member member);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "userId", ignore = true)
   @Mapping(target = "password", ignore = true)
   @Mapping(target = "name", ignore = true)
   @Mapping(target = "email", ignore = true)
   @Mapping(target = "image", ignore = true)
   @Mapping(target = "role", ignore = true)
   @Mapping(target = "isActive", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "createdDate", ignore = true)
   @Mapping(target = "refreshToken", source = "refreshToken")
   Member updateMemberRefreshToken(Member updateMember, @MappingTarget Member member);
 
@@ -58,9 +57,9 @@ public interface MemberMapper {
       target = "password",
       qualifiedByName = "pwEncoder",
       conditionExpression = "java(req.password() != null && !req.password().isEmpty())")
-  @Mapping(target = "updateDate", expression = "java(java.time.LocalDateTime.now())")
+  @Mapping(target = "updatedDate", expression = "java(java.time.LocalDateTime.now())")
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  void updateMember(MemberUpdateRequest req, Member member);
+  void updateMember(MemberUpdateRequest req, @MappingTarget Member member);
 
   ResultResponse toResultResponse(boolean result, String message);
 }
