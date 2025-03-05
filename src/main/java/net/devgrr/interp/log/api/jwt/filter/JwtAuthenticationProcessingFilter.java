@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import net.devgrr.interp.log.api.jwt.JwtService;
 import net.devgrr.interp.log.api.member.MemberRepository;
@@ -38,20 +40,30 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
       checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
       return;
     }
-
     // AccessToken 만 존재 -> AccessToken 검사 후 유저정보 저장, 필터 계속 진행
     checkAccessTokenAndAuthentication(request, response, filterChain);
   }
 
+  /// refresh token 만료 x -> 새로운 access
+  /// refresh token 만료 o -> 저장되어있던 refresh token 삭제, 401 반환 (재로그인 필요)
+  /// refresh token 만료 시간동안 클라이언트의 api 요청이 없으면 재로그인 필요
   private void checkRefreshTokenAndReIssueAccessToken(
       HttpServletResponse response, String refreshToken) {
-
-    memberRepository
-        .findByRefreshToken(refreshToken)
-        .ifPresent(
-            member ->
-                jwtService.sendAccessToken(
-                    response, jwtService.createAccessToken(member.getEmail())));
+    Optional<Member> member = memberRepository.findByRefreshToken(refreshToken);
+    if (jwtService.isTokenValid(refreshToken)) {
+      member.ifPresent(
+          m -> {
+            jwtService.sendAccessToken(response, jwtService.createAccessToken(m.getEmail()));
+//            jwtService.sendRefreshToken(response, jwtService.createRefreshToken());
+//            jwtService.updateRefreshToken(m.getEmail(), refreshToken);
+          });
+    } else {
+      member.ifPresent(
+          m -> {
+            jwtService.destroyRefreshToken(m.getEmail());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          });
+    }
   }
 
   private void checkAccessTokenAndAuthentication(
