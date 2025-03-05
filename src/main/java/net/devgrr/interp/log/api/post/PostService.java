@@ -37,9 +37,9 @@ public class PostService {
   }
 
   @Transactional
-  public Post getPostsById(Integer id, String userId) throws BaseException {
+  public Post getPostsById(Integer id, String email) throws BaseException {
     Post post = existPostsById(id);
-    if (!post.getWriter().getUserId().equals(userId)) {
+    if (!post.getWriter().getEmail().equals(email)) {
       postRepository.incrementViewCount(id);
       entityManager.refresh(post);
     }
@@ -52,23 +52,23 @@ public class PostService {
             title, subTitle, content, tag);
   }
 
-  public List<Post> getPostsByUser(String userId) throws BaseException {
-    Member member = memberService.getUsersById(userId);
+  public List<Post> getPostsByUser(String email) throws BaseException {
+    Member member = memberService.getUsersByEmail(email);
     return postRepository.findAllByWriterAndIsDraftFalse(member);
   }
 
   @Transactional
-  public Post setPosts(PostRequest req, String userId) throws BaseException {
-    Member member = memberService.getUsersById(userId);
+  public Post setPosts(PostRequest req, String email) throws BaseException {
+    Member member = memberService.getUsersByEmail(email);
     Post post = postMapper.toPost(req, member);
     postRepository.save(post);
     return post;
   }
 
   @Transactional
-  public void putPostsById(Integer id, PostRequest req, String userId) throws BaseException {
+  public void putPostsById(Integer id, PostRequest req, String email) throws BaseException {
     Post post = existPostsById(id);
-    if (!post.getWriter().getUserId().equals(userId)) {
+    if (!post.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "수정 권한이 없습니다.");
     }
     Post updPost = postMapper.putPostMapper(req, post);
@@ -76,29 +76,29 @@ public class PostService {
   }
 
   @Transactional
-  public void delPostsById(Integer id, String userId) throws BaseException {
+  public void delPostsById(Integer id, String email) throws BaseException {
     Post post = existPostsById(id);
-    if (!post.getWriter().getUserId().equals(userId)) {
+    if (!post.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "삭제 권한이 없습니다.");
     }
     postRepository.delete(post);
   }
 
   @Transactional
-  public void likePostsById(Integer id, String userId) throws BaseException {
+  public void likePostsById(Integer id, String email) throws BaseException {
     Post post = existPostsById(id);
 
-    if (post.getWriter().getUserId().equals(userId)) {
+    if (post.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "본인 게시글은 추천할 수 없습니다.");
     }
 
-    if (post.getLikes().stream().anyMatch(member -> member.getUserId().equals(userId))) {
+    if (post.getLikes().stream().anyMatch(member -> member.getEmail().equals(email))) {
       // unlike
-      post.getLikes().removeIf(member -> member.getUserId().equals(userId));
+      post.getLikes().removeIf(member -> member.getEmail().equals(email));
       postRepository.save(post);
     } else {
       // like
-      post.getLikes().add(memberService.getUsersById(userId));
+      post.getLikes().add(memberService.getUsersByEmail(email));
       postRepository.save(post);
     }
   }

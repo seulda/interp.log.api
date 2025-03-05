@@ -33,8 +33,8 @@ public class PostController {
           "게시글 목록을 조회한다. <br>userId가 있을 경우 해당 사용자가 등록한 게시글 목록을 조회한다. <br>그 외 검색 조건이 있다면 해당 조건에 대해 키워드가 포함된 게시글을 조회한다.\n")
   @GetMapping
   public List<PostResponse> getPosts(
-      @RequestParam(value = "userId", required = false) @Parameter(description = "사용자 ID")
-          String userId,
+      @RequestParam(value = "email", required = false) @Parameter(description = "사용자 Email")
+          String email,
       @RequestParam(value = "title", required = false) @Parameter(description = "게시글 제목")
           String title,
       @RequestParam(value = "subTitle", required = false) @Parameter(description = "게시글 부제목")
@@ -44,8 +44,8 @@ public class PostController {
       @RequestParam(value = "tag", required = false) @Parameter(description = "게시글 태그") String tag)
       throws BaseException {
     List<Post> posts;
-    if (userId != null && !userId.trim().isEmpty()) {
-      posts = postService.getPostsByUser(userId);
+    if (email != null && !email.trim().isEmpty()) {
+      posts = postService.getPostsByUser(email);
     } else {
       posts =
           (title != null && !title.trim().isEmpty())

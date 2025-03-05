@@ -56,9 +56,10 @@ public interface PostMapper {
       source = "tag",
       qualifiedByName = "tagListToString",
       nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "updatedDate", expression = "java(java.time.LocalDateTime.now())")
   Post putPostMapper(PostRequest postRequest, @MappingTarget Post post);
 
-  @Mapping(source = "post.writer.userId", target = "writerId")
+  @Mapping(source = "post.writer.email", target = "writerEmail")
   @Mapping(source = "post.writer.name", target = "writerName")
   @Mapping(source = "post.likes", target = "likeCount", qualifiedByName = "likeToCount")
   @Mapping(source = "post.tag", target = "tag", qualifiedByName = "stringToTagList")
