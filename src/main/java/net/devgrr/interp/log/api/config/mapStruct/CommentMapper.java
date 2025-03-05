@@ -24,13 +24,13 @@ public interface CommentMapper {
     return likeMember != null ? likeMember.size() : 0;
   }
 
-  @Mapping(source = "comment.writer.userId", target = "writerId")
+  @Mapping(source = "comment.writer.email", target = "writerEmail")
   @Mapping(source = "comment.writer.name", target = "writerName")
   @Mapping(source = "comment.post.id", target = "postId")
   @Mapping(source = "comment.likes", target = "likeCount", qualifiedByName = "likeToCount")
   CommentResponse toResponse(Comment comment);
 
-  @Mapping(source = "comment.writer.userId", target = "writerId")
+  @Mapping(source = "comment.writer.email", target = "writerEmail")
   @Mapping(source = "comment.writer.name", target = "writerName")
   @Mapping(source = "comment.post.id", target = "postId")
   @Mapping(source = "comment.likes", target = "likeCount", qualifiedByName = "likeToCount")

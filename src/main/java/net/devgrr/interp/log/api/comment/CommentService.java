@@ -63,8 +63,8 @@ public class CommentService {
   }
 
   @Transactional
-  public Comment setComments(CommentRequest req, String userId) throws BaseException {
-    Member member = memberService.getUsersById(userId);
+  public Comment setComments(CommentRequest req, String email) throws BaseException {
+    Member member = memberService.getUsersByEmail(email);
     Post post = postService.existPostsById(req.postId());
     Comment comment = commentMapper.toComment(req, post, member);
     commentRepository.save(comment);
@@ -72,9 +72,9 @@ public class CommentService {
   }
 
   @Transactional
-  public void putCommentsById(CommentRequest req, String userId) throws BaseException {
+  public void putCommentsById(CommentRequest req, String email) throws BaseException {
     Comment comment = existCommentById(req.id());
-    if (!comment.getWriter().getUserId().equals(userId)) {
+    if (!comment.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "수정 권한이 없습니다.");
     }
     Comment updComment = commentMapper.putCommentMapper(req, comment);
@@ -82,28 +82,28 @@ public class CommentService {
   }
 
   @Transactional
-  public void delCommentsById(Integer id, String userId) throws BaseException {
+  public void delCommentsById(Integer id, String email) throws BaseException {
     Comment comment = existCommentById(id);
-    if (!comment.getWriter().getUserId().equals(userId)) {
+    if (!comment.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "삭제 권한이 없습니다.");
     }
     commentRepository.delete(comment);
   }
 
   @Transactional
-  public void likeCommentsById(Integer id, String userId) throws BaseException {
+  public void likeCommentsById(Integer id, String email) throws BaseException {
     Comment comment = existCommentById(id);
 
-    if (comment.getWriter().getUserId().equals(userId)) {
+    if (comment.getWriter().getEmail().equals(email)) {
       throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "본인 댓글에는 추천할 수 없습니다.");
     }
 
-    if (comment.getLikes().stream().anyMatch(member -> member.getUserId().equals(userId))) {
+    if (comment.getLikes().stream().anyMatch(member -> member.getEmail().equals(email))) {
       // unlike
-      comment.getLikes().removeIf(member -> member.getUserId().equals(userId));
+      comment.getLikes().removeIf(member -> member.getEmail().equals(email));
     } else {
       // like
-      comment.getLikes().add(memberService.getUsersById(userId));
+      comment.getLikes().add(memberService.getUsersByEmail(email));
     }
     commentRepository.save(comment);
   }
