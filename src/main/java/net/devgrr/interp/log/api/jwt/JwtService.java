@@ -60,9 +60,9 @@ public class JwtService {
         .sign(Algorithm.HMAC512(secret));
   }
 
-  public void updateRefreshToken(String userId, String refreshToken) throws Exception {
+  public void updateRefreshToken(String email, String refreshToken) throws Exception {
     memberRepository
-        .findByUserId(userId)
+        .findByEmail(email)
         .ifPresentOrElse(
             member ->
                 memberRepository.save(
@@ -71,9 +71,9 @@ public class JwtService {
             () -> new Exception("Not found user"));
   }
 
-  public void destroyRefreshToken(String userId) throws Exception {
+  public void destroyRefreshToken(String email) throws Exception {
     memberRepository
-        .findByUserId(userId)
+        .findByEmail(email)
         .ifPresentOrElse(
             member ->
                 memberRepository.save(
