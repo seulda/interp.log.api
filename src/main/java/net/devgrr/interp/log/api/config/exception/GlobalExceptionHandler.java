@@ -58,4 +58,11 @@ public class GlobalExceptionHandler {
           .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage()));
     }
   }
+
+  @ExceptionHandler(ExtendRuntimeException.class)
+  protected ResponseEntity<ErrorResponse> handle(ExtendRuntimeException e) {
+    final ErrorCode errorCode = e.getErrorCode();
+    return ResponseEntity.status(errorCode.getStatus())
+            .body(new ErrorResponse(errorCode, e.getMessage()));
+  }
 }

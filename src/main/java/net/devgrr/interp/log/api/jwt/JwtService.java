@@ -9,6 +9,8 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.devgrr.interp.log.api.config.exception.ErrorCode;
+import net.devgrr.interp.log.api.config.exception.ExtendRuntimeException;
 import net.devgrr.interp.log.api.config.mapStruct.MemberMapper;
 import net.devgrr.interp.log.api.member.MemberRepository;
 import net.devgrr.interp.log.api.member.entity.Member;
@@ -60,7 +62,7 @@ public class JwtService {
         .sign(Algorithm.HMAC512(secret));
   }
 
-  public void updateRefreshToken(String email, String refreshToken) throws Exception {
+  public void updateRefreshToken(String email, String refreshToken) {
     memberRepository
         .findByEmail(email)
         .ifPresentOrElse(
@@ -68,10 +70,12 @@ public class JwtService {
                 memberRepository.save(
                     memberMapper.updateMemberRefreshToken(
                         Member.builder().refreshToken(refreshToken).build(), member)),
-            () -> new Exception("Not found user"));
+            () -> {
+              throw new ExtendRuntimeException("Not found user", ErrorCode.FORBIDDEN);
+            });
   }
 
-  public void destroyRefreshToken(String email) throws Exception {
+  public void destroyRefreshToken(String email) {
     memberRepository
         .findByEmail(email)
         .ifPresentOrElse(
@@ -79,7 +83,9 @@ public class JwtService {
                 memberRepository.save(
                     memberMapper.updateMemberRefreshToken(
                         Member.builder().refreshToken(null).build(), member)),
-            () -> new Exception("Not found user"));
+            () -> {
+              throw new ExtendRuntimeException("Not found user", ErrorCode.FORBIDDEN);
+            });
   }
 
   public void sendAccessAndRefreshToken(
@@ -92,6 +98,11 @@ public class JwtService {
   public void sendAccessToken(HttpServletResponse response, String accessToken) {
     response.setStatus(HttpServletResponse.SC_OK);
     setAccessTokenHeader(response, accessToken);
+  }
+
+  public void sendRefreshToken(HttpServletResponse response, String refreshToken) {
+    response.setStatus(HttpServletResponse.SC_OK);
+    setRefreshTokenHeader(response, refreshToken);
   }
 
   public Optional<String> extractAccessToken(HttpServletRequest request) {
